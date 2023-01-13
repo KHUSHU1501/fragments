@@ -8,7 +8,8 @@
 
 ## How to configure cURL & jq in windows:
 
-- After downloading and extracting the package, add the location of curl.exe & jq.exe to path variable in the system variables.
+- After downloading and extracting the package, add the location of curl.exe & jq.exe to path variable in the system variables.  
+  <sub>_Note_: use `curl` in command prompt (not in powerShell).</sub>
 
 ## How to run eslint:
 
