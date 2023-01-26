@@ -15,11 +15,17 @@
 
 - `npm run lint`
 
-## How to add & commit the updated files:
+## How to run test locally:
+
+- `npm test`
+- `npm run coverage`
+
+## How to add, commit & push the updated files:
 
 1. `git status` --> lists the updated files.
 2. `git add fileName1 fileName2 fileNameN`
 3. `git commit -m "the message with the commit"`
+4. `git push origin main`
 
 ## 🎓 Origin:
 
