@@ -5,7 +5,7 @@ const express = require('express');
 // version and author from package.json
 const { version, author } = require('../../package.json');
 
-// Create a router that we can use to mount our API
+// a router that we can use to mount our API
 const router = express.Router();
 
 // Our authentication middleware
@@ -19,7 +19,7 @@ const response = require('../response');
 router.use(`/v1`, authenticate(), require('./api'));
 
 /**
- * Define a simple health check route. If the server is running
+ * health check route. If the server is running
  * we'll respond with a 200 OK.  If not, the server isn't healthy.
  */
 router.get('/', (req, res) => {
@@ -30,7 +30,6 @@ router.get('/', (req, res) => {
     response.createSuccessResponse({
       status: 'ok',
       author,
-      // Use your own GitHub URL for this...
       githubUrl: 'https://github.com/KHUSHU1501/fragments',
       version,
     })
