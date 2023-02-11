@@ -3,6 +3,7 @@
 const { randomUUID } = require('crypto');
 // Use https://www.npmjs.com/package/content-type to create/parse Content-Type headers
 const contentType = require('content-type');
+const logger = require('../logger');
 
 // Functions for working with fragment metadata/data using our DB
 const {
@@ -30,6 +31,8 @@ class Fragment {
     this.updated = updated || new Date();
     this.type = type;
     this.size = size || 0;
+
+    logger.info(`Created new fragment: ${this.id}`);
   }
 
   /**
@@ -94,6 +97,7 @@ class Fragment {
     if (!Buffer.isBuffer(data)) throw new Error('data must be a Buffer');
     this.size = data.length;
     await this.save();
+    logger.info(`Data saved for fragment: ${this.id}`);
     return writeFragmentData(this.ownerId, this.id, data);
   }
 

@@ -34,8 +34,5 @@ router.post('/fragments', rawBody(), require('./post'));
 // get a single fragment
 router.get('/fragments/:id', require('./getById'));
 
-// post a new fragment
-// router.post('/fragments', require('./post'));
-
 // Export the router so we can mount it in src/app.js
 module.exports = router;

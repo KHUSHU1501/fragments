@@ -11,7 +11,7 @@ const logger = require('../logger');
 module.exports = (strategyName) => {
   return function (req, res, next) {
     /**
-     * Define a custom callback to run after the user has been authenticated
+     * Custom callback to run after the user has been authenticated
      * where we can modify the way that errors are handled, and hash emails.
      * @param {Error} err - an error object
      * @param {string} email - an authenticated user's email address
@@ -32,7 +32,7 @@ module.exports = (strategyName) => {
       req.user = hash(email);
       logger.debug({ email, hash: req.user }, 'Authenticated user');
 
-      // Call the next function in the middleware chain (e.g. your route handler)
+      // Call the next function in the middleware chain
       next();
     }
 
