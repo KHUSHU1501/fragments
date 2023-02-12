@@ -1,6 +1,8 @@
 const request = require('supertest');
 const crypto = require('crypto');
 const app = require('../../src/app');
+require('dotenv').config();
+const url = process.env.API_URL;
 
 describe('POST /v1/fragments', () => {
   // If the request is missing the Authorization header, it should be forbidden
@@ -70,6 +72,6 @@ describe('POST /v1/fragments', () => {
     var id = data.fragment[0].id;
 
     expect(res.statusCode).toBe(201);
-    expect(res.headers.location).toBe(`http://localhost:8080/v1/fragments/${id}`);
+    expect(res.headers.location).toBe(`${url}/v1/fragments/${id}`);
   });
 });
