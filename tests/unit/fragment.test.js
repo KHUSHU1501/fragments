@@ -6,12 +6,11 @@ const wait = async (ms = 10) => new Promise((resolve) => setTimeout(resolve, ms)
 
 const validTypes = [
   `text/plain`,
-  /*
-   Currently, only text/plain is supported. Others will be added later.
-
   `text/markdown`,
   `text/html`,
   `application/json`,
+  /*
+   Currently, only text/plain is supported. Others will be added later.
   `image/png`,
   `image/jpeg`,
   `image/webp`,
@@ -118,9 +117,10 @@ describe('Fragment class', () => {
   });
 
   describe('isSupportedType()', () => {
-    test('common text types are supported, with and without charset', () => {
+    test('common text types and application/json are supported, with and without charset', () => {
       expect(Fragment.isSupportedType('text/plain')).toBe(true);
       expect(Fragment.isSupportedType('text/plain; charset=utf-8')).toBe(true);
+      expect(Fragment.isSupportedType('application/json')).toBe(true);
     });
 
     test('other types are not supported', () => {
@@ -152,7 +152,7 @@ describe('Fragment class', () => {
       // Text fragment
       const fragment = new Fragment({
         ownerId: '1234',
-        type: 'text/plain; charset=utf-8',
+        type: 'text/html',
         size: 0,
       });
       expect(fragment.isText).toBe(true);
@@ -160,13 +160,13 @@ describe('Fragment class', () => {
   });
 
   describe('formats', () => {
-    test('formats returns the expected result for plain text', () => {
+    test('formats returns the expected result', () => {
       const fragment = new Fragment({
         ownerId: '1234',
-        type: 'text/plain; charset=utf-8',
+        type: 'application/json; charset=utf-8',
         size: 0,
       });
-      expect(fragment.formats).toEqual(['text/plain']);
+      expect(fragment.formats).toEqual(['application/json']);
     });
   });
 

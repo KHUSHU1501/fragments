@@ -18,7 +18,7 @@ const {
 class Fragment {
   constructor({ id, ownerId, created, updated, type, size = 0 }) {
     if (!type) throw new Error('type is required');
-    if (type !== 'text/plain' && type !== 'text/plain; charset=utf-8') {
+    if (!Fragment.isSupportedType(type)) {
       throw new Error('invalid type');
     }
     if (!ownerId) throw new Error('ownerId is required');
@@ -116,7 +116,7 @@ class Fragment {
    * @returns {boolean} true if fragment's type is text/*
    */
   get isText() {
-    if (this.mimeType === 'text/plain') return true;
+    if (this.mimeType.includes('text/')) return true;
     else return false;
   }
 
@@ -125,7 +125,7 @@ class Fragment {
    * @returns {Array<string>} list of supported mime types
    */
   get formats() {
-    return ['text/plain'];
+    return [this.mimeType];
   }
 
   /**
@@ -134,7 +134,15 @@ class Fragment {
    * @returns {boolean} true if we support this Content-Type (i.e., type/subtype)
    */
   static isSupportedType(value) {
-    if (value == 'text/plain' || value == 'text/plain; charset=utf-8') return true;
+    if (
+      value == 'text/plain' ||
+      value == 'text/plain; charset=utf-8' ||
+      value == 'text/markdown' ||
+      value == 'text/html' ||
+      value == 'application/json' ||
+      value == 'application/json; charset=utf-8'
+    )
+      return true;
     else return false;
   }
 }

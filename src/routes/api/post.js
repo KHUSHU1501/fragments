@@ -10,9 +10,22 @@ const url = process.env.API_URL;
 module.exports = async (req, res) => {
   logger.debug(`post called'`);
   try {
+    if (!Buffer.isBuffer(req.body)) {
+      return res.status(415).json(
+        response.createErrorResponse({
+          status: 'error',
+          error: {
+            message: 'Body requires correct data that is supported.',
+            code: 415,
+          },
+        })
+      );
+    }
+    logger.debug(`post got body'`);
+
     const fragment = new Fragment({
       ownerId: req.user,
-      type: req.get('content-type'),
+      type: req.get('Content-Type'),
     });
 
     logger.debug(`post got fragment'`);
@@ -22,16 +35,15 @@ module.exports = async (req, res) => {
 
     logger.debug(`post saved fragment'`);
 
-    res.setHeader('Content-type', fragment.type);
     res.setHeader('Location', url + '/v1/fragments/' + fragment.id);
 
-    res.status(201).json(
+    return res.status(201).json(
       response.createSuccessResponse({
         status: 'ok',
-        fragment: [fragment],
+        fragment: fragment,
       })
     );
   } catch (err) {
-    res.status(415).json(response.createErrorResponse(415, err));
+    return res.status(500).json(response.createErrorResponse(500, 'Internal Server Error in POST'));
   }
 };

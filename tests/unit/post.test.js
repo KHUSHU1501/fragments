@@ -25,7 +25,7 @@ describe('POST /v1/fragments', () => {
     const res = await request(app)
       .post('/v1/fragments')
       .auth('user1@email.com', 'password1')
-      .set('content-type', 'text/html');
+      .set('content-type', 'application/html');
     expect(res.statusCode).toBe(415);
   });
 
@@ -43,16 +43,16 @@ describe('POST /v1/fragments', () => {
     const res = await request(app)
       .post('/v1/fragments')
       .auth('user1@email.com', 'password1')
-      .set('content-type', 'text/plain')
+      .set('Content-Type', 'text/plain')
       .send('fragment with data works');
 
     var data = JSON.parse(res.text);
     var user1 = crypto.createHash('sha256').update('user1@email.com').digest('hex');
 
     expect(res.statusCode).toBe(201);
-    expect(res.type).toBe('text/plain');
-    expect(data.fragment[0].size).toBe(24);
-    expect(data.fragment[0].ownerId).toBe(user1);
+    expect(data.fragment.type).toBe('text/plain');
+    expect(data.fragment.size).toBe(24);
+    expect(data.fragment.ownerId).toBe(user1);
     expect(res.text).toContain('ownerId');
     expect(res.text).toContain('id');
     expect(res.text).toContain('type');
@@ -69,9 +69,19 @@ describe('POST /v1/fragments', () => {
       .send('responses include a Location header with a URL to GET the fragment');
 
     var data = JSON.parse(res.text);
-    var id = data.fragment[0].id;
+    var id = data.fragment.id;
 
     expect(res.statusCode).toBe(201);
     expect(res.headers.location).toBe(`${url}/v1/fragments/${id}`);
+  });
+
+  test('returns 500 status code when there is an internal server error', async () => {
+    const res = await request(app)
+      .post('/v1/fragments')
+      .auth('user1@email.com', 'password1')
+      .set('Content-Type', '') // sending null content-type to simulate malformed request data
+      .send(null); // sending null body to simulate malformed request data
+
+    expect(res.statusCode).toBe(500);
   });
 });

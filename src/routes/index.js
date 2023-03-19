@@ -28,7 +28,6 @@ router.get('/', (req, res) => {
   // Send a 200 'OK' response
   res.status(200).json(
     response.createSuccessResponse({
-      status: 'ok',
       author,
       githubUrl: 'https://github.com/KHUSHU1501/fragments',
       version,

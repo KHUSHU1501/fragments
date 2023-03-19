@@ -3,7 +3,8 @@ const app = require('../../src/app');
 
 describe('GET /v1/fragments/:id', () => {
   // If the request is missing the Authorization header, it should be forbidden
-  test('unauthenticated requests are denied', () => request(app).get('/v1/fragments').expect(401));
+  test('unauthenticated requests are denied', () =>
+    request(app).get('/v1/fragments/:id').expect(401));
 
   // If the wrong username/password pair are used (no such user), it should be forbidden
   test('incorrect credentials are denied', () =>
@@ -38,5 +39,27 @@ describe('GET /v1/fragments/:id', () => {
       .get('/v1/fragments/invalid_id')
       .auth('user2@email.com', 'password2');
     expect(res.statusCode).toBe(404);
+  });
+
+  const cheerio = require('cheerio');
+
+  test('authenticated users get fragment data with the given id and extension', async () => {
+    const data = Buffer.from('This is fragment');
+    const postRes = await request(app)
+      .post('/v1/fragments')
+      .auth('user1@email.com', 'password1')
+      .set('Content-Type', 'text/markdown')
+      .send(data);
+
+    const id = postRes.headers.location.split('/').pop();
+
+    const getRes = await request(app)
+      .get(`/v1/fragments/${id}.html`)
+      .auth('user1@email.com', 'password1');
+
+    expect(getRes.statusCode).toBe(200);
+    expect(getRes.headers['content-type']).toMatch(/text\/html/);
+    const $ = cheerio.load(getRes.text);
+    expect($('body').length).toBeGreaterThan(0);
   });
 });
