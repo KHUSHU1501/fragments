@@ -9,6 +9,7 @@ module.exports = (req, res) => {
 
   Fragment.byUser(req.user, req.query?.expand)
     .then((fragments) => {
+      logger.debug(`Fragments found: ${JSON.stringify(fragments)}`);
       res.status(200).json(
         response.createSuccessResponse({
           status: 'ok',
@@ -16,7 +17,8 @@ module.exports = (req, res) => {
         })
       );
     })
-    .catch(() => {
+    .catch((error) => {
+      logger.warn(`Failed to get fragments for user ${req.user.email}: ${error}`);
       res.status(400).json(
         response.createErrorResponse({
           message: `Something went wrong trying to get fragments for user ${req.user.email}`,

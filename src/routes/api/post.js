@@ -8,9 +8,10 @@ const logger = require('../../logger');
 const url = process.env.API_URL;
 
 module.exports = async (req, res) => {
-  logger.debug(`post called'`);
   try {
+    logger.debug(`POST /v1/fragments called`);
     if (!Buffer.isBuffer(req.body)) {
+      logger.warn(`POST /v1/fragments - Body requires correct data that is supported`);
       return res.status(415).json(
         response.createErrorResponse({
           status: 'error',
@@ -21,22 +22,17 @@ module.exports = async (req, res) => {
         })
       );
     }
-    logger.debug(`post got body'`);
-
+    logger.debug(`POST /v1/fragments - Body received`);
     const fragment = new Fragment({
       ownerId: req.user,
       type: req.get('Content-Type'),
     });
-
-    logger.debug(`post got fragment'`);
-
+    logger.debug(`POST /v1/fragments - Fragment created`);
     await fragment.save();
     await fragment.setData(req.body);
-
-    logger.debug(`post saved fragment'`);
-
+    logger.debug(`POST /v1/fragments - Fragment saved`);
     res.setHeader('Location', url + '/v1/fragments/' + fragment.id);
-
+    logger.debug(`POST /v1/fragments - Location header set`);
     return res.status(201).json(
       response.createSuccessResponse({
         status: 'ok',
@@ -44,6 +40,7 @@ module.exports = async (req, res) => {
       })
     );
   } catch (err) {
+    logger.error(`POST /v1/fragments - Internal Server Error: ${err}`);
     return res.status(500).json(response.createErrorResponse(500, 'Internal Server Error in POST'));
   }
 };
