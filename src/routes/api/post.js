@@ -12,15 +12,14 @@ module.exports = async (req, res) => {
     logger.debug(`POST /v1/fragments called`);
     if (!Buffer.isBuffer(req.body)) {
       logger.warn(`POST /v1/fragments - Body requires correct data that is supported`);
-      return res.status(415).json(
-        response.createErrorResponse({
-          status: 'error',
-          error: {
-            message: 'Body requires correct data that is supported.',
-            code: 415,
-          },
-        })
-      );
+      return res
+        .status(415)
+        .json(
+          response.createErrorResponse(
+            415,
+            'Unsupported Media Type: Body requires correct fragment data that is supported'
+          )
+        );
     }
     logger.debug(`POST /v1/fragments - Body received`);
     const fragment = new Fragment({
