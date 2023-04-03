@@ -54,7 +54,7 @@ class Fragment {
   static async byId(ownerId, id) {
     const fragment = await readFragment(ownerId, id);
     if (!fragment) throw new Error('not found');
-    return fragment;
+    return new Fragment(fragment);
   }
 
   /**
@@ -82,6 +82,7 @@ class Fragment {
    */
   getData() {
     try {
+      logger.info(`getData called for fragment: ${this.id}`);
       return readFragmentData(this.ownerId, this.id);
     } catch (err) {
       throw new Error('unable to read fragment data');

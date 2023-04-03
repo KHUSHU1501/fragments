@@ -23,15 +23,21 @@ module.exports = async (req, res) => {
 
     logger.debug(`getById retrieved fragment with ID ${fragment.id}`);
 
-    const fragmentData = await fragment.getData();
+    try {
+      const fragmentData = await fragment.getData();
+      logger.debug(`getById retrieved fragment data for ID ${fragment.id}`);
 
-    // Set the content type to the fragment's type
-    if (req.params.id.includes('html') && fragment.type === 'text/markdown') {
-      res.set('Content-Type', 'text/html');
-      res.status(200).send(md.render(fragmentData.toString()));
-    } else {
-      res.setHeader('Content-Type', fragment.type);
-      res.status(200).send(fragmentData);
+      // Set the content type to the fragment's type
+      if (req.params.id.includes('html') && fragment.type === 'text/markdown') {
+        res.set('Content-Type', 'text/html');
+        res.status(200).send(md.render(fragmentData.toString()));
+      } else {
+        res.setHeader('Content-Type', fragment.type);
+        res.status(200).send(fragmentData);
+      }
+    } catch (error) {
+      logger.error(`Failed to retrieve fragment data for ID ${fragment.id}: ${error}`);
+      res.status(500).json(createErrorResponse(500, error));
     }
   } catch (error) {
     logger.warn(`invalid fragment ID ${req.params.id}`);
