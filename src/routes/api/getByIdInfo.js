@@ -11,6 +11,6 @@ module.exports = async function getMetadataById(req, res) {
     res.status(200).json(createSuccessResponse({ fragment }));
   } catch (error) {
     logger.warn(`invalid fragment id ${req.params.id}`);
-    res.status(404).json(createErrorResponse(404, error));
+    res.status(404).json(createErrorResponse(404, error.message));
   }
 };

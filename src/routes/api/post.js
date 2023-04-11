@@ -40,6 +40,6 @@ module.exports = async (req, res) => {
     );
   } catch (err) {
     logger.error(`POST /v1/fragments - Internal Server Error: ${err}`);
-    return res.status(500).json(response.createErrorResponse(500, 'Internal Server Error in POST'));
+    return res.status(500).json(response.createErrorResponse(500, err.message));
   }
 };

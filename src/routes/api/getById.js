@@ -41,6 +41,6 @@ module.exports = async (req, res) => {
     }
   } catch (error) {
     logger.warn(`invalid fragment ID ${req.params.id}`);
-    res.status(404).json(createErrorResponse(404, error));
+    res.status(404).json(createErrorResponse(404, error.message));
   }
 };

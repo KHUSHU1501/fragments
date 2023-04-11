@@ -12,17 +12,16 @@ module.exports = (req, res) => {
       logger.debug(`Fragments found: ${JSON.stringify(fragments)}`);
       res.status(200).json(
         response.createSuccessResponse({
-          status: 'ok',
           fragments: fragments,
         })
       );
     })
     .catch((error) => {
       logger.warn(`Failed to get fragments for user ${req.user.email}: ${error}`);
-      res.status(400).json(
+      res.status(500).json(
         response.createErrorResponse({
           message: `Something went wrong trying to get fragments for user ${req.user.email}`,
-          code: 400,
+          code: 500,
         })
       );
     });

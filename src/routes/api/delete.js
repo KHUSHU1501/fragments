@@ -11,6 +11,6 @@ module.exports = async (req, res) => {
     await Fragment.delete(req.user, id);
     res.status(200).json(createSuccessResponse(200));
   } catch (error) {
-    res.status(404).json(createErrorResponse(404, error));
+    res.status(404).json(createErrorResponse(404, error.message));
   }
 };

@@ -16,7 +16,14 @@ const {
 } = require('./data');
 
 class Fragment {
-  constructor({ id, ownerId, created, updated, type, size = 0 }) {
+  constructor({
+    id,
+    ownerId,
+    created = new Date().toISOString(),
+    updated = new Date(),
+    type,
+    size = 0,
+  }) {
     if (!type) throw new Error('type is required');
     if (!Fragment.isSupportedType(type)) {
       throw new Error('invalid type');
@@ -27,12 +34,13 @@ class Fragment {
 
     this.id = id || randomUUID();
     this.ownerId = ownerId;
-    this.created = created || new Date();
-    this.updated = updated || new Date();
+    this.created = created || created.toISOString();
+    this.updated = updated || updated.toISOString();
     this.type = type;
     this.size = size || 0;
 
     logger.info(`Created new fragment: ${this.id}`);
+    logger.debug(`Fragment details: ${JSON.stringify(this)}`);
   }
 
   /**
@@ -99,7 +107,7 @@ class Fragment {
     this.size = data.length;
     await this.save();
     logger.info(`Data saved for fragment: ${this.id}`);
-    return writeFragmentData(this.ownerId, this.id, data);
+    return await writeFragmentData(this.ownerId, this.id, data);
   }
 
   /**
@@ -141,7 +149,11 @@ class Fragment {
       value == 'text/markdown' ||
       value == 'text/html' ||
       value == 'application/json' ||
-      value == 'application/json; charset=utf-8'
+      value == 'application/json; charset=utf-8' ||
+      value == 'image/png' ||
+      value == 'image/jpeg' ||
+      value == 'image/gif' ||
+      value == 'image/webp'
     )
       return true;
     else return false;

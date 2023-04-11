@@ -1,7 +1,7 @@
 # tests/integration/post-fragments-unsupported-type.hurl
 POST http://localhost:8080/v1/fragments
 # We're sending a image/png (unsupported) fragment
-Content-Type: image/png
+Content-Type: image/json
 # Include HTTP Basic Auth credentials
 Authorization: Basic dXNlcjFAZW1haWwuY29tOnBhc3N3b3JkMQ==
 # Body of the request goes in `...` when it's a string
