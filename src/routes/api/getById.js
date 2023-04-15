@@ -2,8 +2,8 @@
 const { createErrorResponse } = require('../../response');
 const { Fragment } = require('../../model/fragment');
 const logger = require('../../logger');
-var md = require('markdown-it')();
 const path = require('path');
+const mime = require('mime-types');
 
 /**
  * Get a list of fragments for the current user
@@ -12,12 +12,7 @@ module.exports = async (req, res) => {
   try {
     logger.debug(`getById called with fragment ID ${req.params.id}`);
 
-    let id = req.params.id;
-
-    if (req.params.id.includes('html')) {
-      const ext = path.extname(req.params.id);
-      id = req.params.id.replace(ext, '');
-    }
+    let id = req.params.id.split('.')[0];
 
     const fragment = await Fragment.byId(req.user, id);
 
@@ -27,17 +22,20 @@ module.exports = async (req, res) => {
       const fragmentData = await fragment.getData();
       logger.debug(`getById retrieved fragment data for ID ${fragment.id}`);
 
-      // Set the content type to the fragment's type
-      if (req.params.id.includes('html') && fragment.type === 'text/markdown') {
-        res.set('Content-Type', 'text/html');
-        res.status(200).send(md.render(fragmentData.toString()));
+      const extension = path.extname(req.params.id);
+      logger.debug(`getById extension: ${extension}`);
+
+      if (extension) {
+        logger.debug('Convert fragment to type: ' + extension);
+        var resultdata = await fragment.convertTo(fragmentData, extension);
+        res.setHeader('Content-Type', mime.lookup(extension));
+        res.status(200).send(resultdata);
       } else {
         res.setHeader('Content-Type', fragment.type);
         res.status(200).send(fragmentData);
       }
     } catch (error) {
-      logger.error(`Failed to retrieve fragment data for ID ${fragment.id}: ${error}`);
-      res.status(500).json(createErrorResponse(500, error));
+      res.status(415).json(createErrorResponse(415, error.message));
     }
   } catch (error) {
     logger.warn(`invalid fragment ID ${req.params.id}`);

@@ -4,6 +4,11 @@ const { randomUUID } = require('crypto');
 // Use https://www.npmjs.com/package/content-type to create/parse Content-Type headers
 const contentType = require('content-type');
 const logger = require('../logger');
+const md = require('markdown-it')({
+  html: true,
+});
+const sharp = require('sharp');
+const mime = require('mime-types');
 
 // Functions for working with fragment metadata/data using our DB
 const {
@@ -134,7 +139,19 @@ class Fragment {
    * @returns {Array<string>} list of supported mime types
    */
   get formats() {
-    return [this.mimeType];
+    if (this.mimeType === 'text/plain') return ['text/plain'];
+    else if (this.mimeType === 'text/markdown') return ['text/markdown', 'text/html', 'text/plain'];
+    else if (this.mimeType === 'text/html') return ['text/html', 'text/plain'];
+    else if (this.mimeType === 'application/json') return ['application/json', 'text/plain'];
+    else if (this.mimeType === 'image/png')
+      return ['image/png', 'image/jpeg', 'image/gif', 'image/webp'];
+    else if (this.mimeType === 'image/jpeg')
+      return ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+    else if (this.mimeType === 'image/gif')
+      return ['image/gif', 'image/png', 'image/jpeg', 'image/webp'];
+    else if (this.mimeType === 'image/webp')
+      return ['image/webp', 'image/png', 'image/jpeg', 'image/gif'];
+    else return [];
   }
 
   /**
@@ -158,6 +175,35 @@ class Fragment {
       return true;
     else return false;
   }
-}
 
+  async convertTo(data, extension) {
+    let type = mime.lookup(extension);
+    if (!type) throw new Error('invalid extension');
+    const formats = this.formats;
+    if (!formats.includes(type)) throw new Error('unsupported format');
+    var convertedData;
+    if (type === this.mimeType) return data;
+    if (this.mimeType == 'text/markdown' && type == 'text/html') {
+      convertedData = md.render(data.toString());
+    } else if (this.mimeType == 'text/markdown' && type == 'text/plain') {
+      convertedData = data.toString();
+    } else if (this.mimeType == 'text/html' && type == 'text/plain') {
+      convertedData = data.toString().replace(/(<([^>]+)>)/gi, '');
+    } else if (this.mimeType == 'application/json' && type == 'text/plain') {
+      const obj = JSON.parse(data.toString());
+      const entries = Object.entries(obj);
+      const result = entries.map(([key, value]) => `${key}: ${value}`).join(', ');
+      convertedData = result;
+    } else if (type === 'image/jpeg') {
+      convertedData = await sharp(data).jpeg().toBuffer();
+    } else if (type === 'image/png') {
+      convertedData = await sharp(data).png().toBuffer();
+    } else if (type === 'image/webp') {
+      convertedData = await sharp(data).webp().toBuffer();
+    } else if (type === 'image/gif') {
+      convertedData = await sharp(data).gif().toBuffer();
+    }
+    return convertedData;
+  }
+}
 module.exports.Fragment = Fragment;
