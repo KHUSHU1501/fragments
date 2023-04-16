@@ -1,4 +1,4 @@
-# tests/integration/post-fragments.hurl
+# tests/integration/post-fragments-charset.hurl
 # Authenticated POST to /v1/fragments
 POST http://localhost:8080/v1/fragments
 # We're sending a plain text with charset fragment

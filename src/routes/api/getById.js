@@ -5,9 +5,6 @@ const logger = require('../../logger');
 const path = require('path');
 const mime = require('mime-types');
 
-/**
- * Get a list of fragments for the current user
- */
 module.exports = async (req, res) => {
   try {
     logger.debug(`getById called with fragment ID ${req.params.id}`);

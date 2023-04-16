@@ -1,3 +1,5 @@
+// tests/unit/getById.test.js
+
 const request = require('supertest');
 const app = require('../../src/app');
 
@@ -40,10 +42,29 @@ describe('GET /v1/fragments/:id', () => {
       .auth('user2@email.com', 'password2');
     expect(res.statusCode).toBe(404);
   });
+});
+
+describe('GET /v1/fragments/:id.ext', () => {
+  test('invalid extension returns 415', async () => {
+    const data = Buffer.from('This is fragment');
+    const postRes = await request(app)
+      .post('/v1/fragments')
+      .auth('user1@email.com', 'password1')
+      .set('Content-Type', 'text/markdown')
+      .send(data);
+
+    const id = postRes.headers.location.split('/').pop();
+
+    const getRes = await request(app)
+      .get(`/v1/fragments/${id}.invalid`)
+      .auth('user1@email.com', 'password1');
+
+    expect(getRes.statusCode).toBe(415);
+  });
 
   const cheerio = require('cheerio');
 
-  test('authenticated users get fragment data with the given id and extension', async () => {
+  test('.md to .html', async () => {
     const data = Buffer.from('This is fragment');
     const postRes = await request(app)
       .post('/v1/fragments')
@@ -63,7 +84,7 @@ describe('GET /v1/fragments/:id', () => {
     expect($('body').length).toBeGreaterThan(0);
   });
 
-  test('invalid extension returns 415', async () => {
+  test('.md to .txt', async () => {
     const data = Buffer.from('This is fragment');
     const postRes = await request(app)
       .post('/v1/fragments')
@@ -74,9 +95,48 @@ describe('GET /v1/fragments/:id', () => {
     const id = postRes.headers.location.split('/').pop();
 
     const getRes = await request(app)
-      .get(`/v1/fragments/${id}.invalid`)
+      .get(`/v1/fragments/${id}.txt`)
       .auth('user1@email.com', 'password1');
 
-    expect(getRes.statusCode).toBe(415);
+    expect(getRes.statusCode).toBe(200);
+    expect(getRes.headers['content-type']).toMatch(/text\/plain/);
+    expect(getRes.text).toBe(data.toString());
+  });
+
+  test('.html to .txt', async () => {
+    const data = Buffer.from('This is fragment');
+    const postRes = await request(app)
+      .post('/v1/fragments')
+      .auth('user1@email.com', 'password1')
+      .set('Content-Type', 'text/html')
+      .send(data);
+
+    const id = postRes.headers.location.split('/').pop();
+
+    const getRes = await request(app)
+      .get(`/v1/fragments/${id}.txt`)
+      .auth('user1@email.com', 'password1');
+
+    expect(getRes.statusCode).toBe(200);
+    expect(getRes.headers['content-type']).toMatch(/text\/plain/);
+    expect(getRes.text).toBe(data.toString());
+  });
+
+  test('.application/json to .txt', async () => {
+    const data = Buffer.from('{"This": "is fragment"}');
+    const postRes = await request(app)
+      .post('/v1/fragments')
+      .auth('user1@email.com', 'password1')
+      .set('Content-Type', 'application/json')
+      .send(data);
+
+    const id = postRes.headers.location.split('/').pop();
+
+    const getRes = await request(app)
+      .get(`/v1/fragments/${id}.txt`)
+      .auth('user1@email.com', 'password1');
+
+    expect(getRes.statusCode).toBe(200);
+    expect(getRes.headers['content-type']).toMatch(/text\/plain/);
   });
 });

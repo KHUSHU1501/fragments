@@ -1,5 +1,5 @@
 // src/routes/api/get.js
-// Our response handlers
+
 const response = require('../../response');
 const { Fragment } = require('../../model/fragment');
 const logger = require('../../logger');

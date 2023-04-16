@@ -4,7 +4,6 @@ const { PutCommand, GetCommand, QueryCommand, DeleteCommand } = require('@aws-sd
 const { PutObjectCommand, GetObjectCommand, DeleteObjectCommand } = require('@aws-sdk/client-s3');
 const logger = require('../../../logger');
 
-// Write a fragment's metadata to memory db. Returns a Promise
 // Writes a fragment to DynamoDB. Returns a Promise.
 function writeFragment(fragment) {
   // Configure our PUT params, with the name of the table and item (attributes and keys)
@@ -183,7 +182,6 @@ async function deleteFragment(ownerId, id) {
     await s3Client.send(command);
     await ddbDocClient.send(command2);
   } catch (err) {
-    // If anything goes wrong, log enough info that we can debug
     const { Bucket, Key } = params;
     logger.error({ err, Bucket, Key }, 'Error deleting fragment data from S3');
     throw new Error('unable to delete fragment data');

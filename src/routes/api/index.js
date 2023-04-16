@@ -37,8 +37,10 @@ router.get('/fragments/:id', require('./getById'));
 // get a single fragment metadata
 router.get('/fragments/:id/info', require('./getByIdInfo'));
 
+// delete a single fragment
 router.delete('/fragments/:id', require('./delete'));
 
+// update a single fragment
 router.put('/fragments/:id', rawBody(), require('./put'));
 
 // Export the router so we can mount it in src/app.js

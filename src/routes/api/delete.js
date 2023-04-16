@@ -1,10 +1,7 @@
-// src/routes/api/getById.js
+// src/routes/api/delete.js
 const { createSuccessResponse, createErrorResponse } = require('../../response');
 const { Fragment } = require('../../model/fragment');
 
-/**
- * Get a list of fragments for the current user
- */
 module.exports = async (req, res) => {
   try {
     var id = req.params.id;

@@ -7,13 +7,11 @@ const logger = require('../../logger');
 module.exports = async (req, res) => {
   logger.info(`PUT v1/fragments called`);
 
-  // Get the fragment from the request
   let data = req.body;
   let id = req.params.id;
   let type = req.get('Content-Type');
 
   try {
-    // Update the fragment
     const fragment = await Fragment.byId(req.user, id);
     if (type != fragment.type)
       return res

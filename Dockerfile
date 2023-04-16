@@ -9,6 +9,10 @@ FROM node:18.13.0-alpine@sha256:fda98168118e5a8f4269efca4101ee51dd5c75c0fe56d8eb
 LABEL maintainer="Khushwant Singh Rao <ksrao1@myseneca.ca>"
 LABEL description="Fragments node.js microservice"
 
+# Create a new non-root user
+RUN addgroup -S nodejs && adduser -S nodejs -G nodejs
+USER nodejs
+
 ENV PORT=8080
 
 ENV NPM_CONFIG_LOGLEVEL=warn
@@ -45,8 +49,18 @@ COPY ./src ./src
 # Copy our HTPASSWD file
 COPY ./tests/.htpasswd ./tests/.htpasswd
 
-# Start the container by running our server
-CMD ["npm", "start"]
+# Install process manager
+RUN npm install -g pm2@5.1.0
+
+# Install production node modules
+COPY package*.json ./
+RUN npm install --only=production
+
+# Start the container by running our server using pm2
+CMD ["pm2-runtime", "start", "npm", "--", "start"]
 
 # We run our service on port 8080
 EXPOSE 8080
+
+# Add a healthcheck
+HEALTHCHECK --interval=30s --timeout=30s --start-period=5s --retries=3 CMD curl --fail http://localhost:$PORT/v1/fragments || exit 1
